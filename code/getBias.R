@@ -93,6 +93,7 @@ setGeneric("getPrecomputedBias",
 setMethod("getPrecomputedBias", 
           signature = c(project = "footprintingProject"),
           function(project,
+                   biasDir = NULL,
                    nCores = 4,
                    chunkSize = 100) {
             
@@ -102,8 +103,9 @@ setMethod("getPrecomputedBias",
             referenceGenome <- refGenome(project)
             availableGenomes <- c("ce11","danRer11","dm6","hg19","hg38","mm10","panTro6","sacCer3")
             if(referenceGenome %in% availableGenomes){
-              h5_path <- paste0("../../data/shared/precomputedTn5Bias/", referenceGenome, "Tn5Bias.h5")
-            }else{
+              #h5_path <- paste0("../../data/shared/precomputedTn5Bias/", referenceGenome, "Tn5Bias.h5")
+              h5_path <- paste0(biasDir,"/",referenceGenome,"Tn5Bias.h5")
+              }else{
               stop("Specified reference genome is not available!")
             }
             

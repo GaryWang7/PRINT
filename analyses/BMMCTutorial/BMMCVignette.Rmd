@@ -11,6 +11,34 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r, include = FALSE}
+Uncomment below to run docker environment
+RHOME=/home/rstudio
+SCRATCH1=/mnt/d/garyw/scratch
+docker run -it \
+--cpus=14 \
+--memory="600g" \
+--workdir $HOME \
+--name dturtle \
+-v /mnt/g/Atlas_References:$HOME/Atlas_References \
+-v /mnt/g/spaceranger_visium_counts:$HOME/spaceranger_visium_counts \
+-v /mnt/g/ckd:$HOME/ckd \
+-v /mnt/g:$HOME/g \
+-v /mnt/e:$HOME/e \
+-v /mnt/d/garyw:$HOME/garyw \
+-v $HOME:$HOME \
+-v /mnt/g/Atlas_References:$RHOME/Atlas_References \
+-v /mnt/g/spaceranger_visium_counts:$RHOME/spaceranger_visium_counts \
+-v /mnt/g/ckd:$RHOME/ckd \
+-v /mnt/g/:$RHOME/g \
+-v /mnt/e/:$RHOME/e \
+-v /mnt/d/garyw:$RHOME/garyw \
+-v /var/run/docker.sock:/var/run/docker.sock \
+-e PASSWORD=garywang \
+-e DISABLE_AUTH=TRUE \
+-p 8787:8787 \
+rocker/verse
+```
 ## BMMC Footprinting Tutorial
 
 This document shows how to use our framework to run multi-scale footprinting and TF binding prediction. The tutorial data contains data of 10 CRE regions and 1000 pseudobulks, which is a very small subset of our human bone marrow dataset. If you have a large number of CREs and pseudobulks (like in the case of our full analysis with 200k CREs and 1000 pseudo-bulks), consider dividing CRE regions into chunks and running parallel jobs on a computing cluster. For examples, see the runTFBS.sh and TFBSLoop.sh scripts in /analyses/BMMC/.
@@ -21,9 +49,10 @@ We first source the scripts we need for footprinting
 
 ```{r, message=FALSE}
 # If running in Rstudio, set the working directory to current path
-if (Sys.getenv("RSTUDIO") == "1"){
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-}
+# if (Sys.getenv("RSTUDIO") == "1"){
+#   setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+# }
+library(here)
 
 source("../../code/utils.R")
 source("../../code/getCounts.R")
@@ -34,6 +63,16 @@ source("../../code/visualization.R")
 source("../../code/getGroupData.R")
 source("../../code/footprintTracking.R")
 source("../../code/getTFBS.R")
+
+source(here(code_dir,"utils.R"))
+source(here(code_dir,"getCounts.R"))
+source(here(code_dir,"getBias.R"))
+source(here(code_dir,"getFootprints.R")) 
+source(here(code_dir,"getSubstructures.R"))
+source(here(code_dir,"visualization.R"))
+source(here(code_dir,"getGroupData.R"))
+source(here(code_dir,"footprintTracking.R"))
+source(here(code_dir,"getTFBS.R"))
 ```
 
 Next, we initialize an footprintingProject object. This would be the central object that we use from now on (similar to how you use SeuratObject for Seurat).
